@@ -1,6 +1,6 @@
 
 #       CREATING MULTIPLE VMS. All YOU NEED TO DO IS UNCOMMENT AND EDIT TO YOUR TASTE#
-#  run the this command to bing all the machine up ==>vagrant up --provider=virtualbox
+#  run this command to bring all the machine up ==>vagrant up --provider=virtualbox
 
 Vagrant.configure("2") do |config|
        config.vm.box = "centos/7"
