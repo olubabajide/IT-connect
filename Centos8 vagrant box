@@ -1,0 +1,71 @@
+
+#       CREATING MULTIPLE VMS. All YOU NEED TO DO IS UNCOMMENT AND EDIT TO YOUR TASTE#
+#  run this command to bring all the machine up ==>vagrant up --provider=virtualbox
+
+Vagrant.configure("2") do |config|
+       config.vm.box = "centos/8"
+       config.disksize.size = '50GB'  #run this command in your terminal to have the plugin install "vagrant plugin install vagrant-disksize"
+       config.vm.box_version = "2011.0"
+       config.vm.boot_timeout = 600
+       config.vm.provider "virtualbox" do |v|
+           v.memory = 2048
+
+   end
+
+
+
+#       CONTROL SERVER
+config.vm.define "controlserver" do |controlserver|
+    controlserver.vm.network "private_network", ip: "192.168.33.26"
+    controlserver.vm.hostname = "controlserver"
+    controlserver.vm.provision "shell", inline: <<-SHELL
+         sudo useradd ansible && echo "password" |passwd --stdin ansible
+	       cd /etc/yum.repos.d && sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-* 
+         cd /etc/yum.repos.d && sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+         yum clean all -y
+         yum update -y
+     SHELL
+  end
+
+# SERVER ONE#
+config.vm.define "server1" do |server1|
+  server1.vm.network "private_network", ip: "192.168.33.20"
+  server1.vm.hostname = "server1"
+  server1.vm.provision "shell", inline: <<-SHELL
+         sudo useradd ansible && echo "password" |passwd --stdin ansible
+         cd /etc/yum.repos.d && sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-* 
+         cd /etc/yum.repos.d && sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+         yum clean all -y
+         yum update -y
+     SHELL
+  end
+
+# SERVER TWO#
+config.vm.define "server2" do |server2|
+   server2.vm.network "private_network", ip: "192.168.33.22"
+   server2.vm.hostname = "server2"
+   server2.vm.provision "shell", inline: <<-SHELL
+         sudo useradd ansible && echo "password" |passwd --stdin ansible
+	       cd /etc/yum.repos.d && sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-* 
+         cd /etc/yum.repos.d && sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+         yum clean all -y
+         yum update -y
+     SHELL
+  end
+
+# SERVER THREE#
+    config.vm.define "server3" do |server3|
+    server3.vm.network "private_network", ip: "192.168.33.24"
+    server3.vm.hostname = "server3"
+    server3.vm.provision "shell", inline: <<-SHELL
+         sudo useradd ansible && echo "password" |passwd --stdin ansible
+	       cd /etc/yum.repos.d && sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-* 
+         cd /etc/yum.repos.d && sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+         yum clean all -y
+         yum update -y
+     SHELL
+   end
+
+end
+
+
