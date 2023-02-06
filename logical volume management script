@@ -1,0 +1,143 @@
+#!/bin/bash
+
+# vgscan initializes LVM and looks for existing LVM structures
+# 1-vgscan
+# setup up LVM and scan for existing configurations
+vgscan
+###########################################################################
+
+
+# pvcreate creates LVM physical volumes
+# 2-pvcreate - the files system names must be changed to coincide with the
+# volumes mounted by your system
+pvcreate -v /dev/sda2
+#pvcreate -v /dev/dasdy1
+#pvcreate -v /dev/dasdz1
+#pvcreate -v /dev/dasdaa1
+#pvcreate -v /dev/dasdab1
+#pvcreate -v /dev/dasdac1
+#pvcreate -v /dev/dasdad1
+#pvcreate -v /dev/dasdae1
+#pvcreate -v /dev/dasdaf1
+#pvcreate -v /dev/dasdag1
+#pvcreate -v /dev/dasdah1
+#pvcreate -v /dev/dasdai1
+#pvcreate -v /dev/dasdaj1
+#pvcreate -v /dev/dasdak1
+#pvcreate -v /dev/dasdal1
+#pvcreate -v /dev/dasdam1
+###################################################################################
+
+sleep 5
+
+#vgcreate creates a volume group
+# 3-vgcreate
+# this script builds a volume group with a single physical volume. Additonal
+# volumes are added by 4-vgextend
+#
+vgchange -a n vgdata
+vgremove vgdata
+vgcreate  vgdata /dev/sda2
+#
+# the -s parameter (PE size) determines the maximum logical volume size
+# so the maximum logical volume size is 65,536 x PE size
+# The logical volume has a maximum size of 65,536 Physical Elements (PE's),
+# (64K PE size x 65,536 = 4 GB)
+#  PE   Maximum
+#  size logical Vol
+#       size
+#  512M 32,768 GB       absolute max
+#  32M  2,048 GB        linux 2.4.7 kernel limit
+#  4M   256 GB
+#  1M   64 GB
+#  512K 32 GB
+#  256K 16 GB
+#  128K 8 GB
+#  64K  4 GB
+#  32K  2 GB
+#  16K  1 GB
+#  8K   512 MB
+############################################################################################
+
+sleep 5
+
+# vgextend adds the rest of the volumes to the volume group
+# 4-vgextend
+vgextend vgdata /dev/sda2
+#vgextend vgname /dev/dasdy1
+#vgextend vgname /dev/dasdz1
+#vgextend vgname /dev/dasdaa1
+#vgextend vgname /dev/dasdab1
+#vgextend vgname /dev/dasdac1
+#vgextend vgname /dev/dasdad1
+#vgextend vgname /dev/dasdae1
+#vgextend vgname /dev/dasdaf1
+#vgextend vgname /dev/dasdag1
+#vgextend vgname /dev/dasdah1
+#vgextend vgname /dev/dasdai1
+#vgextend vgname /dev/dasdaj1
+#vgextend vgname /dev/dasdak1
+#vgextend vgname /dev/dasdal1
+#vgextend vgname /dev/dasdam1
+##############################################################################################
+
+sleep 5
+
+# lvcreate creates 4 volumes, 8 gb each, striped over 16 physical volumes
+# 5-lvcreate
+# create 4 logical volumes
+# -i 16 - 16 stripes
+# -I 16 - 16K per stripe
+# -L 8g - 8 gb logical volumes
+# - n   - logical volumes name (if -n is omitted, names would be lvol1 to 4)
+lvcreate -L 26g -v vgdata -n lvdata1
+lvcreate -L 26g -v vgdata -n lvdata2
+lvcreate -L 26g -v vgdata -n lvdata3
+#lvcreate -L 15g -v vgdata -n lvdata3
+#lvcreate -i 16 -I 16 -L 8g -v vgname -n lvol4
+################################################################################################
+
+sleep 5
+
+# mkfs puts a file system on the volume
+# 6-mkfs
+mke2fs /dev/vgdata/lvdata1
+mke2fs /dev/vgdata/lvdata2
+#mke2fs /dev/vgdata/lvdata3
+#mke2fs -b 4096 /dev/vgname/lvol3
+#mke2fs -b 4096 /dev/vgname/lvol4
+####################################################################################################
+
+
+# mount mounts the logical volumes
+# 7-mount
+mkdir /data
+e2fsck -p /dev/vgdata/lvdata1
+e2fsck -p /dev/vgdata/lvdata2
+e2fsck -p /dev/vgdata/lvdata3
+mount /dev/vgdata/lvdata1 /vmindata
+mount /dev/vgdata/lvdata2 /vmseldata
+mount /dev/vgdata/lvdata3 /vmstdata
+#mount /dev/vgdata/lvdata2 /etc
+#mkdir -p /mnt/lvmvol2
+#mkdir -p /mnt/lvmvol3
+#mkdir -p /mnt/lvmvol4
+#e2fsck -p /dev/vgdata/lvdata
+#e2fsck -p /dev/vgname/lvol2
+#e2fsck -p /dev/vgname/lvol3
+#e2fsck -p /dev/vgname/lvol4
+#mount /dev/vgname/lvol1 /mnt/lvmvol1
+#mount /dev/vgname/lvol2 /mnt/lvmvol2
+#mount /dev/vgname/lvol3 /mnt/lvmvol3
+#mount /dev/vgdata/lvdata /data
+###################################################################################################
+
+sleep 5
+
+# Add the file details to /etc/fstab to survive reboot
+echo "/dev/mapper/vgdata-lvdata     /vmindata  xfs     defaults        0 0" >> /etc/fstab
+
+echo "/dev/mapper/vgdata-lvdata     /vmseldata  xfs     defaults        0 0" >> /etc/fstab
+
+
+echo "/dev/mapper/vgdata-lvdata     /vmstdata  xfs     defaults        0 0" >> /etc/fstab
